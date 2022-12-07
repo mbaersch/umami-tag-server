@@ -2,5 +2,5 @@ homepage: "https://www.markus-baersch.de"
 documentation: "https://github.com/mbaersch/umami-tag-server#readme"
 versions:
   # Latest version
-  - sha: xxxxxxxxx
+  - sha: b434e3e882d478beb23662569a0ace3931c10dcc
     changeNotes: Initial release.
