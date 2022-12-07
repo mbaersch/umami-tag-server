@@ -10,8 +10,8 @@ You can override the hostname from incoming requests to match a user-defined val
 ### Advanced Settings
 This section contains additional options that allows enhanced data redaction. You can optionally send an empty referrer and delete any parameters from tracked urls. 
 
-#### Overriding Page Path
-If you want to collect data from several sources in different paths of the same profile, you can override the page path with a different value. This option also can be used for further data redaction or enrichment.
+#### Changing Page Path
+If you want to collect data from several sources in different paths of the same profile, you can override the page path with a different value. This option also can be used for further data redaction or enrichment - as well as the option to delete all parameters from the path before sending data to Umami.
 
-### Change Event Names
+#### Change Event Names
 Every event name can be translated for Umami using an optional override field. You can for example set the new event name with a lookup table. 
