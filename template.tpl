@@ -144,6 +144,7 @@ const getAllEventData = require('getAllEventData');
 const sendHttpRequest = require('sendHttpRequest');
 const JSON = require('JSON');
 const parseUrl = require('parseUrl');
+const getRequestHeader = require('getRequestHeader');
 
 const eventData = getAllEventData();
 const url = eventData.page_location;
@@ -188,7 +189,7 @@ if (url) {
     }, 
     { 
       headers: {
-       'user-agent': eventData.user_agent,
+       'user-agent': eventData.user_agent || getRequestHeader("user-agent"),
        'content-type': 'application/json' 
       }, 
       method: 'POST', 
@@ -234,6 +235,71 @@ ___SERVER_PERMISSIONS___
       "param": [
         {
           "key": "allowedUrls",
+          "value": {
+            "type": 1,
+            "string": "any"
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "read_request",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "headerWhitelist",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "headerName"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "user-agent"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "key": "headersAllowed",
+          "value": {
+            "type": 8,
+            "boolean": true
+          }
+        },
+        {
+          "key": "requestAccess",
+          "value": {
+            "type": 1,
+            "string": "specific"
+          }
+        },
+        {
+          "key": "headerAccess",
+          "value": {
+            "type": 1,
+            "string": "specific"
+          }
+        },
+        {
+          "key": "queryParameterAccess",
           "value": {
             "type": 1,
             "string": "any"
