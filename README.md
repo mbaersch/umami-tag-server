@@ -1,5 +1,11 @@
-# Umami Analytics (umami-tag-server)
-Umami Analytics - Custom Tag Template for Server-Side Google Tag Manager
+# Umami Analytics
+**Custom Tag Template for server-side Google Tag Manager**
+
+Send events from server-side GTM to Umami 
+
+![Template Status](https://img.shields.io/badge/Community%20Template%20Gallery%20Status-submitted-orange)
+
+---
 
 ## Usage
 Install the tag template and add a new *Umami* tag. Enter the URL of your tracking endpoint in the first field and add your website id from your Umami settings below. All other settings are optional. 
