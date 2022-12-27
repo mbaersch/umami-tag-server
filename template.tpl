@@ -66,6 +66,21 @@ ___TEMPLATE_PARAMETERS___
         "displayName": "Host / Domain (Optional)",
         "simpleValueType": true,
         "help": "Enter an optional fixed domain to override event data"
+      },
+      {
+        "type": "TEXT",
+        "name": "timeout",
+        "displayName": "Timeout (ms)",
+        "simpleValueType": true,
+        "defaultValue": 1000,
+        "valueValidators": [
+          {
+            "type": "NON_EMPTY"
+          },
+          {
+            "type": "POSITIVE_NUMBER"
+          }
+        ]
       }
     ]
   },
@@ -193,7 +208,7 @@ if (url) {
        'content-type': 'application/json' 
       }, 
       method: 'POST', 
-      timeout: 1000
+      timeout: data.timeout||1000
     }, 
     JSON.stringify(umamiEvent)
   );
