@@ -1,10 +1,10 @@
-# Umami Analytics
+# Umami Analytics [UNOFFICIAL]
 **Custom Tag Template for server-side Google Tag Manager**
 
 Send events from server-side GTM to Umami 
 
-![Template Status](https://img.shields.io/badge/Community%20Template%20Gallery%20Status-submitted-orange)
-
+[![Template Status](https://img.shields.io/badge/Community%20Template%20Gallery%20Status-published-green)](https://tagmanager.google.com/gallery/#/owners/mbaersch/templates/umami-tag-server) ![Repo Size](https://img.shields.io/github/repo-size/mbaersch/umami-tag-server) ![License](https://img.shields.io/github/license/mbaersch/umami-tag-server)
+    
 ---
 
 ## Usage
