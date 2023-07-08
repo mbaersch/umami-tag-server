@@ -2,5 +2,8 @@ homepage: "https://www.markus-baersch.de"
 documentation: "https://github.com/mbaersch/umami-tag-server#readme"
 versions:
   # Latest version
+  - sha: 020bae1dc6550e5c283b982fea601f65a982c063
+    changeNotes: Add Stape logs format.
+
   - sha: b682a2e4dcb86d987f130ff628a478f9e84102ff
     changeNotes: Initial release.
