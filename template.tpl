@@ -141,6 +141,34 @@ ___TEMPLATE_PARAMETERS___
         ]
       }
     ]
+  },
+  {
+    "displayName": "Logs Settings",
+    "name": "logsGroup",
+    "groupStyle": "ZIPPY_CLOSED",
+    "type": "GROUP",
+    "subParams": [
+      {
+        "type": "RADIO",
+        "name": "logType",
+        "radioItems": [
+          {
+            "value": "no",
+            "displayValue": "Do not log"
+          },
+          {
+            "value": "debug",
+            "displayValue": "Log to console during debug and preview"
+          },
+          {
+            "value": "always",
+            "displayValue": "Always log to console"
+          }
+        ],
+        "simpleValueType": true,
+        "defaultValue": "debug"
+      }
+    ]
   }
 ]
 
@@ -148,7 +176,7 @@ ___TEMPLATE_PARAMETERS___
 ___SANDBOXED_JS_FOR_SERVER___
 
 /**
- * @description Custom server-side Google Tag Manager Tag Template 
+ * @description Custom server-side Google Tag Manager Tag Template
  * Send events to Umami
  * @version 1.0.1
  * @see {@link https://github.com/mbaersch|GitHub} for more info
@@ -160,6 +188,12 @@ const sendHttpRequest = require('sendHttpRequest');
 const JSON = require('JSON');
 const parseUrl = require('parseUrl');
 const getRequestHeader = require('getRequestHeader');
+const makeString = require('makeString');
+const getContainerVersion = require('getContainerVersion');
+const logToConsole = require('logToConsole');
+
+const isLoggingEnabled = determinateIsLoggingEnabled();
+const traceId = getRequestHeader('trace-id');
 
 const eventData = getAllEventData();
 const url = eventData.page_location;
@@ -172,7 +206,7 @@ if (url) {
   const ref = data.deleteReferrer === true ? "" : eventData.page_referrer || "";
   const dom = data.domain || parsedUrl.hostname || null;
 
-  let page = (data.setPath === true) && data.setPathVar ? 
+  let page = (data.setPath === true) && data.setPathVar ?
       data.setPathVar : url.split(parsedUrl.hostname)[1];
   if (data.redactUrlParams === true)
     page = page.split("?")[0];
@@ -192,29 +226,79 @@ if (url) {
     umamiEvent.payload.referrer = ref;
   } else {
     umamiEvent.type = "event";
-    umamiEvent.payload.event_name = 
-      (data.setEvent === true) && data.setEventVar ? 
-        data.setEventVar : name;  
+    umamiEvent.payload.event_name =
+        (data.setEvent === true) && data.setEventVar ?
+            data.setEventVar : name;
+  }
+
+  if (isLoggingEnabled) {
+    logToConsole(
+        JSON.stringify({
+          Name: 'Umami',
+          Type: 'Request',
+          TraceId: traceId,
+          EventName: makeString(umamiEvent.type === 'pageview' ? 'page_view' : umamiEvent.payload.event_name),
+          RequestMethod: 'POST',
+          RequestUrl: serviceUrl,
+          RequestBody: umamiEvent,
+        })
+    );
   }
 
   sendHttpRequest(
-    serviceUrl, (statusCode) => {
-      if (statusCode >= 200 && statusCode < 300) data.gtmOnSuccess();
-      else data.gtmOnFailure(); 
-    }, 
-    { 
-      headers: {
-       'user-agent': eventData.user_agent || getRequestHeader("user-agent"),
-       'content-type': 'application/json' 
-      }, 
-      method: 'POST', 
-      timeout: data.timeout||1000
-    }, 
-    JSON.stringify(umamiEvent)
+      serviceUrl, (statusCode, headers, body) => {
+        if (isLoggingEnabled) {
+          logToConsole(
+              JSON.stringify({
+                Name: 'Umami',
+                Type: 'Response',
+                TraceId: traceId,
+                EventName: makeString(umamiEvent.type === 'pageview' ? 'page_view' : umamiEvent.payload.event_name),
+                ResponseStatusCode: statusCode,
+                ResponseHeaders: headers,
+                ResponseBody: body,
+              })
+          );
+        }
+
+        if (statusCode >= 200 && statusCode < 300) data.gtmOnSuccess();
+        else data.gtmOnFailure();
+      },
+      {
+        headers: {
+          'user-agent': eventData.user_agent || getRequestHeader("user-agent"),
+          'content-type': 'application/json'
+        },
+        method: 'POST',
+        timeout: data.timeout||1000
+      },
+      JSON.stringify(umamiEvent)
   );
 
-} else 
+} else
   data.gtmOnFailure();
+
+function determinateIsLoggingEnabled() {
+  const containerVersion = getContainerVersion();
+  const isDebug = !!(
+      containerVersion &&
+      (containerVersion.debugMode || containerVersion.previewMode)
+  );
+
+  if (!data.logType) {
+    return isDebug;
+  }
+
+  if (data.logType === 'no') {
+    return false;
+  }
+
+  if (data.logType === 'debug') {
+    return isDebug;
+  }
+
+  return data.logType === 'always';
+}
 
 
 ___SERVER_PERMISSIONS___
@@ -288,6 +372,21 @@ ___SERVER_PERMISSIONS___
                     "string": "user-agent"
                   }
                 ]
+              },
+              {
+                "type": 3,
+                "mapKey": [
+                  {
+                    "type": 1,
+                    "string": "headerName"
+                  }
+                ],
+                "mapValue": [
+                  {
+                    "type": 1,
+                    "string": "trace-id"
+                  }
+                ]
               }
             ]
           }
@@ -326,6 +425,37 @@ ___SERVER_PERMISSIONS___
       "isEditedByUser": true
     },
     "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "logging",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "environments",
+          "value": {
+            "type": 1,
+            "string": "all"
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "read_container_data",
+        "versionId": "1"
+      },
+      "param": []
+    },
+    "isRequired": true
   }
 ]
 
@@ -338,3 +468,5 @@ scenarios: []
 ___NOTES___
 
 Created on 7.12.2022, 05:01:54
+
+
